@@ -179,12 +179,21 @@ fig.update_layout(
 )
 
 # Prepare data as JSON for JavaScript filtering
-nuc_plants_json = nuclear_plants[['Longitude', 'Latitude', 'Plant Name', 'City', 'State', 'nuclear_capacity_mw']].to_dict('records')
-gas_plants_json = gas_plants[['Longitude', 'Latitude', 'Plant Name', 'City', 'State', 'gas_capacity_mw']].to_dict('records')
-gen_plants_json = gen_plants[['Longitude', 'Latitude', 'Plant Name', 'City', 'State', 'other_capacity_mw']].to_dict('records')
-wind_plants_json = wind_plants[['Longitude', 'Latitude', 'Plant Name', 'City', 'State', 'wind_capacity_mw']].to_dict('records')
-solar_plants_json = solar_plants[['Longitude', 'Latitude', 'Plant Name', 'City', 'State', 'solar_capacity_mw']].to_dict('records')
-dc_points_json = df[['Longitude', 'Latitude', 'Data Center Name', 'Provider', 'Address']].to_dict('records')
+# IMPORTANT: Replace NaN with None so json.dumps outputs 'null' instead of 'NaN' (which is valid JS but can cause issues)
+# Or better, drop rows with missing coordinates for plotting
+nuclear_plants = nuclear_plants.dropna(subset=['Latitude', 'Longitude'])
+gas_plants = gas_plants.dropna(subset=['Latitude', 'Longitude'])
+gen_plants = gen_plants.dropna(subset=['Latitude', 'Longitude'])
+wind_plants = wind_plants.dropna(subset=['Latitude', 'Longitude'])
+solar_plants = solar_plants.dropna(subset=['Latitude', 'Longitude'])
+df_clean = df.dropna(subset=['Latitude', 'Longitude'])
+
+nuc_plants_json = nuclear_plants[['Longitude', 'Latitude', 'Plant Name', 'City', 'State', 'nuclear_capacity_mw']].fillna(0).to_dict('records')
+gas_plants_json = gas_plants[['Longitude', 'Latitude', 'Plant Name', 'City', 'State', 'gas_capacity_mw']].fillna(0).to_dict('records')
+gen_plants_json = gen_plants[['Longitude', 'Latitude', 'Plant Name', 'City', 'State', 'other_capacity_mw']].fillna(0).to_dict('records')
+wind_plants_json = wind_plants[['Longitude', 'Latitude', 'Plant Name', 'City', 'State', 'wind_capacity_mw']].fillna(0).to_dict('records')
+solar_plants_json = solar_plants[['Longitude', 'Latitude', 'Plant Name', 'City', 'State', 'solar_capacity_mw']].fillna(0).to_dict('records')
+dc_points_json = df_clean[['Longitude', 'Latitude', 'Data Center Name', 'Provider', 'Address']].fillna('').to_dict('records')
 
 total_data_centers = len(df)
 
